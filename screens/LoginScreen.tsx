@@ -1,27 +1,28 @@
 import * as React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity,Image, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen({ navigation }: { navigation: any}) {
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+    <ScrollView contentContainerStyle={styles.contentContainerStyle}>
       <View style={styles.container}>
         <Text style={styles.loginHeading1}>Let’s start exploring</Text>
         <Text style={styles.loginHeading2}>Please sIgn up for access to various demos and showcases for comproDLS™ MOBILE.</Text>
         <TouchableOpacity
           style={styles.loginButton}
-          onPress={() => navigation.navigate('Login')}
+          onPress={() => signIn(navigation)}
         >
           <Text style={styles.loginButtonText}>Sign in with Google</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.loginButton}
-          onPress={() => navigation.navigate('Login')}
+          onPress={() => signIn(navigation)}
         >
           <Text style={styles.loginButtonText}>Sign in with Facebook</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.loginButton}
-          onPress={() => navigation.navigate('Login')}
+          onPress={() => signIn(navigation)}
         >
           <Text style={styles.loginButtonText}>Sign in with Twitter</Text>
         </TouchableOpacity>
@@ -36,13 +37,16 @@ export default function LoginScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  contentContainerStyle: {
+    flexGrow: 1
+  },
   container: {
     paddingHorizontal: 16,
     flex: 1,
     justifyContent: 'space-between',
     backgroundColor: '#8435EB'
   },
-  
+
   loginHeading1: {
     fontFamily: "Montserrat",
     fontStyle: "normal",
@@ -93,3 +97,28 @@ const styles = StyleSheet.create({
     alignSelf: "center"
   },
 });
+
+const signIn = async (navigation:any)=>{
+  // fetch("http://10.0.2.2:3000/users/signin",{
+  fetch("http://192.168.138.1:3000/users/signin",{
+    method:"POST",
+    headers: {
+     'Content-Type': 'application/json'
+   },
+   body:JSON.stringify({
+     "email":"amit@amit.com",
+     "password":"amit123"
+   })
+  })
+  .then(res=>res.json())
+  .then(async (data)=>{
+         try {
+           await AsyncStorage.setItem('token',data.token);
+           // to do @AmitSharma-Dev 3rd screen
+           navigation.replace("Home");
+         } catch (e) {
+           console.log("error hai",e)
+            Alert.alert(e)
+         }
+  })
+}
